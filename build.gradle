@@ -276,10 +276,17 @@ configure(allprojects) { project ->
 		resolutionStrategy {
 			cacheChangingModulesFor 0, "seconds"
 		}
+//		repositories {
+//			mavenCentral()
+//			maven { url "https://repo.spring.io/libs-spring-framework-build" }
+//		}
 		repositories {
-			mavenCentral()
-			maven { url "https://repo.spring.io/libs-spring-framework-build" }
+			mavenLocal()
+			maven { url 'https://maven.aliyun.com/repository/public' }
+			maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+			maven { url 'https://maven.aliyun.com/repository/spring' }
 		}
+
 	}
 	configurations.all {
 		resolutionStrategy {
