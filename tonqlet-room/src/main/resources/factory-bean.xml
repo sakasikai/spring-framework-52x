@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!--
+		calss: 工厂方法所在类
+		factory-method: 静态工厂方法
+		constructor-arg:如果工厂静态方法需要参数,则使用constructor-arg来配置
+	 -->
+
+	<bean id="staticCatFactory"
+		  class="org.springframework.myBeans.factory.StaticCatFactory"
+		  factory-method="createCat">
+		<constructor-arg index="0" value="布偶" />
+	</bean>
+
+	<bean id="staticCatFactory2"
+		  class="org.springframework.myBeans.factory.StaticCatFactory"
+		  factory-method="createCat">
+		<constructor-arg index="0" value="银渐" />
+	</bean>
+
+	<!--  instance factory  -->
+
+	<!-- 1、先配置出实例工厂对象   -->
+	<bean id="instanceCatFactoryBean" class="org.springframework.myBeans.factory.InstanceCatFactory" />
+	<!--  2、配置我们需要创建的AirPlane使用哪个工厂创建  -->
+	<!-- factory-bean：指定使用哪个工厂实例       -->
+	<!-- factory-method：指定使用哪个工厂方法     -->
+	<!-- constructor-arg：可以设置指定方法的参数  -->
+	<bean id="instanceCatFactory"
+		  factory-bean="instanceCatFactoryBean"
+		  factory-method="createCat">
+		<constructor-arg index="0" value="花猫" />
+	</bean>
+
+</beans>
