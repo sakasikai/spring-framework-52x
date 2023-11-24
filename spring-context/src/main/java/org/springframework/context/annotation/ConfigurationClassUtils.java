@@ -55,6 +55,7 @@ abstract class ConfigurationClassUtils {
 
 	public static final String CONFIGURATION_CLASS_LITE = "lite";
 
+	// ConfigurationClassPostProcessor.class.configurationClass
 	public static final String CONFIGURATION_CLASS_ATTRIBUTE =
 			Conventions.getQualifiedAttributeName(ConfigurationClassPostProcessor.class, "configurationClass");
 
@@ -90,6 +91,7 @@ abstract class ConfigurationClassUtils {
 			return false;
 		}
 
+		// 1. 获取 (beanDef, className) 的 metadata
 		AnnotationMetadata metadata;
 		if (beanDef instanceof AnnotatedBeanDefinition &&
 				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
@@ -122,11 +124,17 @@ abstract class ConfigurationClassUtils {
 			}
 		}
 
+
+		// 2. metadata 中获取 Configuration 注解
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
+			// config 不空，被标注了@Configuration
+			// 同时开启了 proxyBeanMethods
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
 		else if (config != null || isConfigurationCandidate(metadata)) {
+			// 被标注了@Configuration
+			// OR 仅被注解了 @Component, @ComponentScan, @Import, @ImportResource @Bean
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}
 		else {
@@ -156,12 +164,14 @@ abstract class ConfigurationClassUtils {
 		}
 
 		// Any of the typical annotations found?
+		// @Component, @ComponentScan, @Import, @ImportResource
 		for (String indicator : candidateIndicators) {
 			if (metadata.isAnnotated(indicator)) {
 				return true;
 			}
 		}
 
+		// @Bean
 		// Finally, let's look for @Bean methods...
 		return hasBeanMethods(metadata);
 	}

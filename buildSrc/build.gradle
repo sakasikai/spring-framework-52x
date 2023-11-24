@@ -1,9 +1,22 @@
+//buildscript {
+//	repositories {
+//		mavenLocal()
+//		maven { url 'https://maven.aliyun.com/repository/public' }
+//		maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+//		maven { url 'https://maven.aliyun.com/repository/spring' }
+//	}
+//}
+
 plugins {
 	id 'java-gradle-plugin'
 }
 
 repositories {
-	mavenCentral()
+	mavenLocal()
+	maven { url 'https://maven.aliyun.com/repository/public' }
+	maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+	maven { url 'https://maven.aliyun.com/repository/spring' }
+
 	gradlePluginPortal()
 }
 

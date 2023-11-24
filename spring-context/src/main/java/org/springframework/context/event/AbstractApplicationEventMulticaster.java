@@ -192,6 +192,7 @@ public abstract class AbstractApplicationEventMulticaster
 			}
 		}
 
+		// ‼️用 existingRetriever 或 newRetriever 检索 Listeners
 		if (existingRetriever != null) {
 			Collection<ApplicationListener<?>> result = existingRetriever.getApplicationListeners();
 			if (result != null) {
@@ -475,13 +476,15 @@ public abstract class AbstractApplicationEventMulticaster
 		public Collection<ApplicationListener<?>> getApplicationListeners() {
 			List<ApplicationListener<?>> allListeners = new ArrayList<>(
 					this.applicationListeners.size() + this.applicationListenerBeans.size());
+			// 现成的 listeners 对象
 			allListeners.addAll(this.applicationListeners);
+
 			if (!this.applicationListenerBeans.isEmpty()) {
 				BeanFactory beanFactory = getBeanFactory();
 				for (String listenerBeanName : this.applicationListenerBeans) {
 					try {
-						ApplicationListener<?> listener =
-								beanFactory.getBean(listenerBeanName, ApplicationListener.class);
+						// 根据 listenerBeanName 创建 listener
+						ApplicationListener<?> listener = beanFactory.getBean(listenerBeanName, ApplicationListener.class);
 						if (!allListeners.contains(listener)) {
 							allListeners.add(listener);
 						}

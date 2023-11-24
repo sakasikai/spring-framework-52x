@@ -5,6 +5,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Scope;
 import org.springframework.myBeans.entity.Bird;
 import org.springframework.myBeans.entity.Zoo;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -47,8 +48,8 @@ public class AppConfig {
 	 * @author: maiqi
 	 * @update: 2023/11/5 12:02
 	 */
-	@Bean(initMethod = "myInit", destroyMethod = "myDestroy")
-	// @Scope("prototype")
+	@Bean(name = {"bird"}, initMethod = "myInit", destroyMethod = "myDestroy")
+	@Scope("prototype")
 	public Bird aBird(){
 		return new Bird();
 	}

@@ -101,9 +101,11 @@ public class EventListenerMethodProcessor
 	public void afterSingletonsInstantiated() {
 		ConfigurableListableBeanFactory beanFactory = this.beanFactory;
 		Assert.state(this.beanFactory != null, "No ConfigurableListableBeanFactory set");
+		// 以Object.class为匹配条件，即拿出所有Bean
 		String[] beanNames = beanFactory.getBeanNamesForType(Object.class);
 		for (String beanName : beanNames) {
 			if (!ScopedProxyUtils.isScopedTarget(beanName)) {
+				// 从 beanName 推导出 class
 				Class<?> type = null;
 				try {
 					type = AutoProxyUtils.determineTargetClass(beanFactory, beanName);
@@ -115,6 +117,7 @@ public class EventListenerMethodProcessor
 					}
 				}
 				if (type != null) {
+					// 是否是代理模式，是的话，抽取出原始 class
 					if (ScopedObject.class.isAssignableFrom(type)) {
 						try {
 							Class<?> targetClass = AutoProxyUtils.determineTargetClass(
@@ -130,6 +133,9 @@ public class EventListenerMethodProcessor
 							}
 						}
 					}
+
+					// 根据beanName, ScopedObject 确定好 baneName 的 classType
+					// 比如："internalEventListenerProcessor" ==》EventListenerMethodProcessor.class
 					try {
 						processBean(beanName, type);
 					}
@@ -140,15 +146,17 @@ public class EventListenerMethodProcessor
 				}
 			}
 		}
+
 	}
 
 	private void processBean(final String beanName, final Class<?> targetType) {
 		if (!this.nonAnnotatedClasses.contains(targetType) &&
 				AnnotationUtils.isCandidateClass(targetType, EventListener.class) &&
-				!isSpringContainerClass(targetType)) {
+				!isSpringContainerClass(targetType)) { // 轻微的缩小查找范围，忽略
 
 			Map<Method, EventListener> annotatedMethods = null;
 			try {
+				// targetType 中含有 EventListener.class
 				annotatedMethods = MethodIntrospector.selectMethods(targetType,
 						(MethodIntrospector.MetadataLookup<EventListener>) method ->
 								AnnotatedElementUtils.findMergedAnnotation(method, EventListener.class));
@@ -167,25 +175,33 @@ public class EventListenerMethodProcessor
 				}
 			}
 			else {
+				// annotatedMethods 不空
 				// Non-empty set of methods
 				ConfigurableApplicationContext context = this.applicationContext;
 				Assert.state(context != null, "No ApplicationContext set");
+
+				// DefaultEventListenerFactory
 				List<EventListenerFactory> factories = this.eventListenerFactories;
 				Assert.state(factories != null, "EventListenerFactory List not initialized");
 				for (Method method : annotatedMethods.keySet()) {
+					// only one DefaultEventListenerFactory
 					for (EventListenerFactory factory : factories) {
 						if (factory.supportsMethod(method)) {
 							Method methodToUse = AopUtils.selectInvocableMethod(method, context.getType(beanName));
+							// 创建 applicationListener
 							ApplicationListener<?> applicationListener =
 									factory.createApplicationListener(beanName, targetType, methodToUse);
 							if (applicationListener instanceof ApplicationListenerMethodAdapter) {
 								((ApplicationListenerMethodAdapter) applicationListener).init(context, this.evaluator);
 							}
+							// 加入到 context
 							context.addApplicationListener(applicationListener);
 							break;
 						}
 					}
 				}
+
+
 				if (logger.isDebugEnabled()) {
 					logger.debug(annotatedMethods.size() + " @EventListener methods processed on bean '" +
 							beanName + "': " + annotatedMethods);

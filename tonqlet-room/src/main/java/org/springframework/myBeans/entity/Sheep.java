@@ -1,8 +1,15 @@
 package org.springframework.myBeans.entity;
 
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.helper.Describable;
 import org.springframework.myBeans.abstractClass.AbstractSheep;
 import org.springframework.myBeans.Object.Wool;
+import org.springframework.myBeans.events.DinnerEvent;
+import org.springframework.myBeans.events.SleepEvent;
 import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
 
 /**
  * @author maiqi
@@ -11,7 +18,7 @@ import org.springframework.stereotype.Component;
  * @create 2023/11/5 18:04
  */
 @Component("sheep")
-public class Sheep extends AbstractSheep {
+public class Sheep extends AbstractSheep implements ApplicationListener<ApplicationEvent>, Describable {
 
 	public void produceAndDescWool(){
 		Wool o = getWoolFromSubClass();
@@ -36,4 +43,17 @@ public class Sheep extends AbstractSheep {
 		return null;
 	}
 
+	@Override
+	public void onApplicationEvent(ApplicationEvent event) {
+
+		if(event instanceof DinnerEvent){
+			System.out.print("咩～ ");
+			this.desc(this.toString(), "eat Grass as my Dinner～");
+		} else if (event instanceof SleepEvent) {
+			System.out.print("咩～ ");
+			this.desc(this.toString(), "go back to my House～");
+		} else {
+			//
+		}
+	}
 }

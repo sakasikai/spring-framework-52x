@@ -109,26 +109,37 @@ class ComponentScanAnnotationParser {
 			scanner.getBeanDefinitionDefaults().setLazyInit(true);
 		}
 
+		// 1。上面👆是配置scanner本身
+		// 2。下面👇🏻是确定scanner扫描的范围，以包为单位
 		Set<String> basePackages = new LinkedHashSet<>();
 		String[] basePackagesArray = componentScan.getStringArray("basePackages");
 		for (String pkg : basePackagesArray) {
 			String[] tokenized = StringUtils.tokenizeToStringArray(this.environment.resolvePlaceholders(pkg),
 					ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
+			// delimiters = ",; \t\n" ==> tokenized
+			// 全加入 basePackages
 			Collections.addAll(basePackages, tokenized);
 		}
+
+		// clazz所在的包
 		for (Class<?> clazz : componentScan.getClassArray("basePackageClasses")) {
 			basePackages.add(ClassUtils.getPackageName(clazz));
 		}
+
+		// 加了@ComponentScan的clazz 所在包
 		if (basePackages.isEmpty()) {
+			// SpringBoot中是启动类
 			basePackages.add(ClassUtils.getPackageName(declaringClass));
 		}
 
 		scanner.addExcludeFilter(new AbstractTypeHierarchyTraversingFilter(false, false) {
 			@Override
 			protected boolean matchClassName(String className) {
-				return declaringClass.equals(className);
+				return declaringClass.equals(className); // 和自己相同的class，排除掉
 			}
 		});
+
+		// 3。扫描组件
 		return scanner.doScan(StringUtils.toStringArray(basePackages));
 	}
 

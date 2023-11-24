@@ -185,10 +185,11 @@ public class ApplicationListenerMethodAdapter implements GenericApplicationListe
 	 * matches and handling a non-null result, if any.
 	 */
 	public void processEvent(ApplicationEvent event) {
+		// arguments of onApplicationEvent()
 		Object[] args = resolveArguments(event);
-		if (shouldHandle(event, args)) {
+		if (shouldHandle(event, args)) { // condition 属性
 			Object result = doInvoke(args);
-			if (result != null) {
+			if (result != null) { // 结果做为 继续发布的 Events
 				handleResult(result);
 			}
 			else {
@@ -302,6 +303,7 @@ public class ApplicationListenerMethodAdapter implements GenericApplicationListe
 
 		ReflectionUtils.makeAccessible(this.method);
 		try {
+			// 触发 event listener method
 			return this.method.invoke(bean, args);
 		}
 		catch (IllegalArgumentException ex) {
@@ -407,6 +409,7 @@ public class ApplicationListenerMethodAdapter implements GenericApplicationListe
 					payloadType != null && declaredEventType.isAssignableFrom(payloadType)) {
 				return declaredEventType;
 			}
+			// event instanceof eventClass
 			if (eventClass.isInstance(event)) {
 				return declaredEventType;
 			}

@@ -25,11 +25,19 @@ public class SpringApplication {
 	}
 
 	public void done(){
-		this.scope_lifeCycle();
 		this.method_injection();
-	}
-	public void toBe(){
 		this.factory_method();
+		this.scope_lifeCycle();
+		this.observer_pattern();
+	}
+
+	public void toBe(){
+		this.observer_pattern();
+	}
+
+	public void observer_pattern(){
+		Zoo z = ctx.getBean(Zoo.class);
+		z.manageEvening();
 	}
 
 
@@ -91,7 +99,7 @@ public class SpringApplication {
 		ctx.getBean(Bird.class).desc();
 		ctx.getBean(Bird.class).desc();
 
-		((AnnotationConfigApplicationContext) ctx).close();
+//		((AnnotationConfigApplicationContext) ctx).close();
 	}
 
 	/**
